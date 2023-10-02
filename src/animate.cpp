@@ -16,7 +16,7 @@ int main()
 
     Plotter plotter(2000);
 
-    JerkCircuit circuit(0.002, 0.5);
+    JerkCircuit circuit(0.002, +0.507, -0.013, +0.017);
 
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Jerk Circuit Simulation");
     SetTargetFPS(30);

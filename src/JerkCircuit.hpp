@@ -16,6 +16,8 @@ namespace Analog
     private:
         const double timeDilation;
         const double w0;    // initial voltage of capacitor C1
+        const double x0;    // initial voltage of capacitor C2
+        const double y0;    // initial voltage of capacitor C3
 
         const double R1 = 1000;
         const double R2 = 1000;
@@ -53,9 +55,11 @@ namespace Analog
     public:
         const int iterationLimit = 5;
 
-        JerkCircuit(double _timeDilation, double _w0)
+        JerkCircuit(double _timeDilation, double _w0, double _x0, double _y0)
             : timeDilation(_timeDilation)
             , w0(_w0)
+            , x0(_x0)
+            , y0(_y0)
         {
             initialize();
         }
@@ -63,7 +67,9 @@ namespace Analog
         void initialize()
         {
             w1 = w0;
-            x1 = y1 = z1 = 0;
+            x1 = x0;
+            y1 = y0;
+            z1 = -(R6/R4)*x0;       // op-amp acts instantly
             dw = dx = dy = 0;
         }
 
