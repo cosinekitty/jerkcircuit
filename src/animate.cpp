@@ -14,9 +14,9 @@ int main()
 {
     using namespace Analog;
 
-    Plotter plotter(5000);
+    Plotter plotter(2000);
 
-    JerkCircuit circuit;
+    JerkCircuit circuit(0.002, 0.5);
 
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Jerk Circuit Simulation");
     SetTargetFPS(30);
