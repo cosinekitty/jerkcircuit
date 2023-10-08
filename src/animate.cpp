@@ -6,17 +6,38 @@
     https://github.com/cosinekitty/jerkcircuit
 */
 
+#include <cstdio>
+#include <cstring>
 #include "JerkCircuit.hpp"
 #include "plotter.hpp"
 
 
-int main()
+int main(int argc, const char *argv[])
 {
     using namespace Analog;
 
-    Plotter plotter(2000);
+    if (argc != 2)
+    {
+        printf("USAGE: animate [jerk|ruck]\n");
+        return 1;
+    }
+    const char *kind = argv[1];
 
-    JerkCircuit circuit(0.002, +0.507, -0.013, +0.017);
+    JerkCircuit jerk(0.002, +0.507, -0.013, +0.017);
+    Rucklidge ruck;
+
+    Signal *signal = nullptr;
+    if (!strcmp(kind, "jerk"))
+        signal = &jerk;
+    else if (!strcmp(kind, "ruck"))
+        signal = &ruck;
+    else
+    {
+        printf("ERROR: Unknown signal type '%s'\n", kind);
+        return 1;
+    }
+
+    Plotter plotter(2000);
 
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Jerk Circuit Simulation");
     SetTargetFPS(30);
@@ -24,12 +45,11 @@ int main()
     {
         BeginDrawing();
         ClearBackground(BLACK);
-        plotter.plot(circuit.xVoltage(), circuit.yVoltage());
+        plotter.plot(signal->xVoltage(), signal->yVoltage());
         EndDrawing();
         for (int s = 0; s < SAMPLES_PER_FRAME; ++s)
-            circuit.update(SAMPLE_RATE);
+            signal->update(SAMPLE_RATE);
     }
     CloseWindow();
     return 0;
 }
-

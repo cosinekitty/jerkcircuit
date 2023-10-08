@@ -8,10 +8,11 @@
 #pragma once
 
 #include <cmath>
+#include "signal.hpp"
 
 namespace Analog
 {
-    class JerkCircuit
+    class JerkCircuit : public Signal
     {
     private:
         const double timeDilation;
@@ -73,7 +74,7 @@ namespace Analog
             dw = dx = dy = 0;
         }
 
-        int update(float sampleRateHz)
+        int update(float sampleRateHz) override
         {
             double dt = timeDilation / sampleRateHz;
 
@@ -134,8 +135,8 @@ namespace Analog
         }
 
         double wVoltage() const { return w1; }
-        double xVoltage() const { return x1; }
-        double yVoltage() const { return y1; }
-        double zVoltage() const { return z1; }
+        double xVoltage() const override { return x1; }
+        double yVoltage() const override { return y1; }
+        double zVoltage() const override { return z1; }
     };
 }
