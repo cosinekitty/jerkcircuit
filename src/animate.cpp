@@ -1,16 +1,16 @@
 /*
     animate.cpp  -  Don Cross <cosinekitty@gmail.com>  -  2023-10-01
 
-    Runs the Jerk Circuit simulation and renders an X/Y plot.
+    Animates various chaotic oscillators I am studying as candidates
+    for VCV Rack modules.
 
     https://github.com/cosinekitty/jerkcircuit
 */
 
 #include <cstdio>
 #include <cstring>
-#include "JerkCircuit.hpp"
+#include "MakeChaoticOscillator.hpp"
 #include "plotter.hpp"
-
 
 int main(int argc, const char *argv[])
 {
@@ -22,30 +22,24 @@ int main(int argc, const char *argv[])
         return 1;
     }
     const char *kind = argv[1];
-
-    Rucklidge ruck;
-
-    ChaoticOscillator *signal = nullptr;
-    if (!strcmp(kind, "ruck"))
-        signal = &ruck;
-    else
+    auto osc = MakeChaoticOscillator(kind);
+    if (!osc)
     {
-        printf("ERROR: Unknown signal type '%s'\n", kind);
+        printf("ERROR: Unknown chaotic oscillator kind '%s'\n", kind);
         return 1;
     }
 
-    Plotter plotter(2000);
-
+    Plotter plotter(5000);
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Jerk Circuit Simulation");
     SetTargetFPS(30);
     while (!WindowShouldClose())
     {
         BeginDrawing();
         ClearBackground(BLACK);
-        plotter.plot(signal->xVoltage(), signal->yVoltage());
+        plotter.plot(osc->xVoltage(), osc->yVoltage());
         EndDrawing();
         for (int s = 0; s < SAMPLES_PER_FRAME; ++s)
-            signal->update(SAMPLE_RATE);
+            osc->update(SAMPLE_RATE);
     }
     CloseWindow();
     return 0;

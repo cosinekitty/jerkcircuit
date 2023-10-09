@@ -11,7 +11,7 @@ if [[ "$1" == "debug" ]]; then
 else
     CPPOPT="-O3"
 fi
-g++ ${CPPOPT} -Wall -Werror -o rangetest rangetest.cpp || exit 1
+g++ ${CPPOPT} -Wall -Werror -o rangetest rangetest.cpp MakeChaoticOscillator.cpp || exit 1
 
 ./rangetest $1 || exit 1
 exit 0

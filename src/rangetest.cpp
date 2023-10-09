@@ -2,7 +2,7 @@
 #include <cstdio>
 #include <cstring>
 #include <algorithm>
-#include "ChaoticOscillator.hpp"
+#include "MakeChaoticOscillator.hpp"
 
 static int RangeTest(Analog::ChaoticOscillator& osc);
 
@@ -16,19 +16,14 @@ int main(int argc, const char *argv[])
         return 1;
     }
 
-    ChaoticOscillator *osc = nullptr;
     const char *kind = argv[1];
-    if (!strcmp(kind, "ruck"))
-        osc = new Rucklidge();
-
-    if (osc == nullptr)
+    auto osc = MakeChaoticOscillator(kind);
+    if (!osc)
     {
-        printf("ERROR: Unknown kind '%s'\n", kind);
+        printf("ERROR: Unknown chaotic oscillator kind '%s'\n", kind);
         return 1;
     }
-
     int rc = RangeTest(*osc);
-    delete osc;
     return rc;
 }
 
