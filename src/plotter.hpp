@@ -14,20 +14,44 @@ const int SAMPLES_PER_FRAME = SAMPLE_RATE / FRAME_RATE;
 const double MIN_VOLTAGE = -5.5;
 const double MAX_VOLTAGE = +5.5;
 
-struct PlotPoint
+struct ScreenPoint
 {
-    int x;
-    int y;
+    int sx;
+    int sy;
 
-    PlotPoint()
-        : x(-1)
-        , y(-1)
+    ScreenPoint(int _sx, int _sy)
+        : sx(_sx)
+        , sy(_sy)
+        {}
+};
+
+struct PlotVector
+{
+    double nx;
+    double ny;
+    double nz;
+
+    PlotVector(double _nx, double _ny, double _nz)
+        : nx(_nx)
+        , ny(_ny)
+        , nz(_nz)
         {}
 
-    PlotPoint(int _x, int _y)
-        : x(_x)
-        , y(_y)
-        {}
+    void rotateX(double c, double s)
+    {
+        double ry = c*ny - s*nz;
+        double rz = s*ny + c*nz;
+        ny = ry;
+        nz = rz;
+    }
+
+    void rotateY(double c, double s)
+    {
+        double rx = c*nx - s*nz;
+        double rz = s*nx + c*nz;
+        nx = rx;
+        nz = rz;
+    }
 };
 
 class Plotter
@@ -35,24 +59,55 @@ class Plotter
 private:
     const std::size_t trailLength;
     std::size_t trailIndex = 0;
-    std::vector<PlotPoint> trail;
+    std::vector<PlotVector> trail;
+    PlotVector xdir{1.0, 0.0, 0.0};
+    PlotVector ydir{0.0, 1.0, 0.0};
 
 public:
     explicit Plotter(int _trailLength)
         : trailLength(std::max(2, _trailLength))
         {}
 
-    void plot(double vx, double vy)
+    void rotateX(double radians)
     {
-        // Map voltage ranges -12V..+12V to screen dimensions.
-        int sx = static_cast<int>(std::round(((vx - MIN_VOLTAGE) / (MAX_VOLTAGE - MIN_VOLTAGE)) * SCREEN_WIDTH));
-        int sy = static_cast<int>(std::round(((MAX_VOLTAGE - vy) / (MAX_VOLTAGE - MIN_VOLTAGE)) * SCREEN_HEIGHT));
+        double c = std::cos(radians);
+        double s = std::sin(radians);
+        xdir.rotateX(c, s);
+        ydir.rotateX(c, s);
+    }
+
+    void rotateY(double radians)
+    {
+        double c = std::cos(radians);
+        double s = std::sin(radians);
+        xdir.rotateY(c, s);
+        ydir.rotateY(c, s);
+    }
+
+    ScreenPoint project(double vx, double vy, double vz) const
+    {
+        double x = vx*xdir.nx + vy*xdir.ny + vz*xdir.nz;
+        double y = vx*ydir.nx + vy*ydir.ny + vz*ydir.nz;
+        return ScreenPoint(
+            static_cast<int>(std::round(((x - MIN_VOLTAGE) / (MAX_VOLTAGE - MIN_VOLTAGE)) * SCREEN_WIDTH)),
+            static_cast<int>(std::round(((MAX_VOLTAGE - y) / (MAX_VOLTAGE - MIN_VOLTAGE)) * SCREEN_HEIGHT))
+        );
+    }
+
+    ScreenPoint project(const PlotVector &vec) const
+    {
+        return project(vec.nx, vec.ny, vec.nz);
+    }
+
+    void plot(double vx, double vy, double vz)
+    {
+        PlotVector current(vx, vy, vz);
 
         // On the first render, prefill the trail buffer.
         while (trail.size() < trailLength)
-            trail.push_back(PlotPoint(sx, sy));
+            trail.push_back(current);
 
-        trail.at(trailIndex) = PlotPoint(sx, sy);
+        trail.at(trailIndex) = current;
         trailIndex = (trailIndex + 1) % trailLength;
 
         Color color = BLACK;
@@ -69,9 +124,9 @@ public:
             if (j == trailIndex)
                 break;
 
-            const PlotPoint &a = trail.at(i);
-            const PlotPoint &b = trail.at(j);
-            DrawLine(a.x, a.y, b.x, b.y, color);
+            ScreenPoint a = project(trail.at(i));
+            ScreenPoint b = project(trail.at(j));
+            DrawLine(a.sx, a.sy, b.sx, b.sy, color);
             i = j;
 
             if (--fadeCount == 0)
@@ -83,6 +138,7 @@ public:
             }
         }
 
-        DrawCircle(sx, sy, 2.0f, WHITE);
+        ScreenPoint s = project(current);
+        DrawCircle(s.sx, s.sy, 2.0f, WHITE);
     }
 };

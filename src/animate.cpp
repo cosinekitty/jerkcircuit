@@ -33,11 +33,20 @@ int main(int argc, const char *argv[])
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Jerk Circuit Simulation");
     SetTargetFPS(30);
     const double dt = 1.0 / SAMPLE_RATE;
+    const double angleIncrement = 0.01;
     while (!WindowShouldClose())
     {
+        if (IsKeyDown(KEY_DOWN))
+            plotter.rotateX(+angleIncrement);
+        if (IsKeyDown(KEY_UP))
+            plotter.rotateX(-angleIncrement);
+        if (IsKeyDown(KEY_LEFT))
+            plotter.rotateY(+angleIncrement);
+        if (IsKeyDown(KEY_RIGHT))
+            plotter.rotateY(-angleIncrement);
         BeginDrawing();
         ClearBackground(BLACK);
-        plotter.plot(osc->vx(), osc->vy());
+        plotter.plot(osc->vx(), osc->vy(), osc->vz());
         EndDrawing();
         for (int s = 0; s < SAMPLES_PER_FRAME; ++s)
             osc->update(dt);
