@@ -15,6 +15,7 @@ namespace Analog
         return AMPLITUDE * (2*r - 1);
     }
 
+
     struct SlopeVector
     {
         double mx;
@@ -28,16 +29,21 @@ namespace Analog
             {}
     };
 
+
     class ChaoticOscillator
     {
     protected:
-        double x;
-        double y;
-        double z;
+        double x{};
+        double y{};
+        double z{};
 
         virtual SlopeVector slopes() const = 0;
 
     private:
+        const double x0;
+        const double y0;
+        const double z0;
+
         const double xmin;
         const double xmax;
         const double ymin;
@@ -47,36 +53,47 @@ namespace Analog
 
     public:
         ChaoticOscillator(
-            double x0, double y0, double z0,
+            double _x0, double _y0, double _z0,
             double _xmin, double _xmax,
             double _ymin, double _ymax,
             double _zmin, double _zmax
         )
-            : x(x0)
-            , y(y0)
-            , z(z0)
+            : x0(_x0)
+            , y0(_y0)
+            , z0(_z0)
             , xmin(_xmin)
             , xmax(_xmax)
             , ymin(_ymin)
             , ymax(_ymax)
             , zmin(_zmin)
             , zmax(_zmax)
-            {}
+        {
+            initialize();
+        }
 
         // Use this version to bootstrap oscillators with unknown ranges
-        ChaoticOscillator(double x0, double y0, double z0)
-            : x(x0)
-            , y(y0)
-            , z(z0)
+        ChaoticOscillator(double _x0, double _y0, double _z0)
+            : x0(_x0)
+            , y0(_y0)
+            , z0(_z0)
             , xmin(0.0)
             , xmax(0.0)
             , ymin(0.0)
             , ymax(0.0)
             , zmin(0.0)
             , zmax(0.0)
-            {}
+        {
+            initialize();
+        }
 
         virtual ~ChaoticOscillator() {}
+
+        void initialize()
+        {
+            x = x0;
+            y = y0;
+            z = z0;
+        }
 
         // Scaled values...
         double vx() const { return Remap(x, xmin, xmax); }
@@ -123,6 +140,7 @@ namespace Analog
                  +0.040,  +15.387)
             {}
     };
+
 
     class Aizawa : public ChaoticOscillator     // http://www.3d-meier.de/tut19/Seite3.html
     {
