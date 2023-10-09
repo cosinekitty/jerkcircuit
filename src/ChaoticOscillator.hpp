@@ -214,8 +214,13 @@ namespace Analog
 
     public:
         Sprott()
-            : ChaoticOscillator(0.03, 0.01, 0.02)
+            : ChaoticOscillator(
+                0.010847, 0.003817, 0.485189,
+                -3.860,  +4.061,
+                -5.565,  +6.006,
+                -8.437,  +8.085)
         {
+            max_dt = 0.0001;
         }
     };
 }
