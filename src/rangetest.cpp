@@ -53,9 +53,9 @@ int main(int argc, const char *argv[])
 static int CheckLimits(const Analog::ChaoticOscillator& osc)
 {
     const double LIMIT = 1000.0;
-    double x = osc.xVoltage();
-    double y = osc.yVoltage();
-    double z = osc.zVoltage();
+    double x = osc.vx();
+    double y = osc.vy();
+    double z = osc.vz();
     if (!std::isfinite(x) || std::abs(x) > LIMIT)
     {
         printf("x is out of bounds: %lg\n", x);
@@ -95,7 +95,7 @@ static int RangeTest(Analog::ChaoticOscillator& osc)
         if (CheckLimits(osc)) return 1;
     }
 
-    printf("Settled  at: x=%10.6lf, y=%10.6lf, z=%10.6lf\n", osc.xVoltage(), osc.yVoltage(), osc.zVoltage());
+    printf("Settled  at: x=%10.6lf, y=%10.6lf, z=%10.6lf\n", osc.vx(), osc.vy(), osc.vz());
 
     for (int i = 0; i < SIM_SAMPLES; ++i)
     {
@@ -103,22 +103,22 @@ static int RangeTest(Analog::ChaoticOscillator& osc)
         if (CheckLimits(osc)) return 1;
         if (i == 0)
         {
-            xMin = xMax = osc.xVoltage();
-            yMin = yMax = osc.yVoltage();
-            zMin = zMax = osc.zVoltage();
+            xMin = xMax = osc.vx();
+            yMin = yMax = osc.vy();
+            zMin = zMax = osc.vz();
         }
         else
         {
-            xMin = std::min(xMin, osc.xVoltage());
-            xMax = std::max(xMax, osc.xVoltage());
-            yMin = std::min(yMin, osc.yVoltage());
-            yMax = std::max(yMax, osc.yVoltage());
-            zMin = std::min(zMin, osc.zVoltage());
-            zMax = std::max(zMax, osc.zVoltage());
+            xMin = std::min(xMin, osc.vx());
+            xMax = std::max(xMax, osc.vx());
+            yMin = std::min(yMin, osc.vy());
+            yMax = std::max(yMax, osc.vy());
+            zMin = std::min(zMin, osc.vz());
+            zMax = std::max(zMax, osc.vz());
         }
     }
 
-    printf("Finished at: x=%10.6lf, y=%10.6lf, z=%10.6lf\n", osc.xVoltage(), osc.yVoltage(), osc.zVoltage());
+    printf("Finished at: x=%10.6lf, y=%10.6lf, z=%10.6lf\n", osc.vx(), osc.vy(), osc.vz());
 
     printf("x range: %10.6lf %10.6lf\n", xMin, xMax);
     printf("y range: %10.6lf %10.6lf\n", yMin, yMax);

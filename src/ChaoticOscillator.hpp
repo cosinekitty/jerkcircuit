@@ -6,6 +6,10 @@ namespace Analog
     inline double Remap(double v, double vmin, double vmax)
     {
         // Remaps v from the range [vmin, vmax] to [-AMPLITUDE, +AMPLITUDE].
+        // But before we know the range, return the unmodified signal.
+        if (vmax <= vmin)
+            return v;
+
         // How far along the range is v in the range [vmin, vmax]?
         double r = (v - vmin) / (vmax - vmin);      // [0, 1]
         return AMPLITUDE * (2*r - 1);
@@ -44,11 +48,24 @@ namespace Analog
             , zmax(_zmax)
             {}
 
+        // Use this version to bootstrap oscillators with unknown ranges
+        ChaoticOscillator(double x0, double y0, double z0)
+            : x(x0)
+            , y(y0)
+            , z(z0)
+            , xmin(0.0)
+            , xmax(0.0)
+            , ymin(0.0)
+            , ymax(0.0)
+            , zmin(0.0)
+            , zmax(0.0)
+            {}
+
         virtual ~ChaoticOscillator() {}
 
-        double xVoltage() const { return Remap(x, xmin, xmax); }
-        double yVoltage() const { return Remap(y, ymin, ymax); }
-        double zVoltage() const { return Remap(z, zmin, zmax); }
+        double vx() const { return Remap(x, xmin, xmax); }
+        double vy() const { return Remap(y, ymin, ymax); }
+        double vz() const { return Remap(z, zmin, zmax); }
 
         virtual void update(float sampleRateHz) = 0;
     };
@@ -71,6 +88,33 @@ namespace Analog
             double dx = dt*(-k*x + a*y - y*z);
             double dy = dt*(x);
             double dz = dt*(-z + y*y);
+            x += dx;
+            y += dy;
+            z += dz;
+        }
+    };
+
+    class Aizawa : public ChaoticOscillator     // http://www.3d-meier.de/tut19/Seite3.html
+    {
+    private:
+        const double a = 0.95;
+        const double b = 0.7;
+        const double c = 0.6;
+        const double d = 3.5;
+        const double e = 0.25;
+        const double f = 0.1;
+
+    public:
+        Aizawa()
+            : ChaoticOscillator(0.1, 0.0, 0.0)
+            {}
+
+        void update(float sampleRateHz) override
+        {
+            double dt = 1.0 / sampleRateHz;
+            double dx = dt*((z-b)*x - d*y);
+            double dy = dt*(d*x + (z-b)*y);
+            double dz = dt*(c + a*z - z*z*z/3 - (x*x + y*y)*(1 + e*z) + f*z*x*x*x);
             x += dx;
             y += dy;
             z += dz;

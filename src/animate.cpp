@@ -36,7 +36,7 @@ int main(int argc, const char *argv[])
     {
         BeginDrawing();
         ClearBackground(BLACK);
-        plotter.plot(osc->xVoltage(), osc->yVoltage());
+        plotter.plot(osc->vx(), osc->vy());
         EndDrawing();
         for (int s = 0; s < SAMPLES_PER_FRAME; ++s)
             osc->update(SAMPLE_RATE);
