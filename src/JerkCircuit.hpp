@@ -8,11 +8,11 @@
 #pragma once
 
 #include <cmath>
-#include "signal.hpp"
+#include "ChaoticOscillator.hpp"
 
 namespace Analog
 {
-    class JerkCircuit : public Signal
+    class JerkCircuit : public ChaoticOscillator
     {
     private:
         const double timeDilation;

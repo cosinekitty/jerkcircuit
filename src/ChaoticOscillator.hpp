@@ -1,7 +1,7 @@
 #pragma once
 namespace Analog
 {
-    class Signal
+    class ChaoticOscillator
     {
     public:
         virtual double xVoltage() const = 0;
@@ -11,7 +11,7 @@ namespace Analog
     };
 
 
-    class Rucklidge : public Signal     // http://www.3d-meier.de/tut19/Seite17.html
+    class Rucklidge : public ChaoticOscillator     // http://www.3d-meier.de/tut19/Seite17.html
     {
     private:
         const double k = 2.0;

@@ -26,7 +26,7 @@ int main(int argc, const char *argv[])
     JerkCircuit jerk(0.002, +0.507, -0.013, +0.017);
     Rucklidge ruck;
 
-    Signal *signal = nullptr;
+    ChaoticOscillator *signal = nullptr;
     if (!strcmp(kind, "jerk"))
         signal = &jerk;
     else if (!strcmp(kind, "ruck"))
