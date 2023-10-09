@@ -3,6 +3,11 @@
 
 namespace Analog
 {
+    const std::vector<const char *> ChaoticOscillatorKinds
+    {
+        "ruck"
+    };
+
     std::unique_ptr<ChaoticOscillator> MakeChaoticOscillator(const char *kind)
     {
         if (kind == nullptr)

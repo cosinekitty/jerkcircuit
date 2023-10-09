@@ -12,18 +12,41 @@ int main(int argc, const char *argv[])
 
     if (argc != 2)
     {
-        printf("USAGE: rangetest kind\n");
+        printf("USAGE: rangetest [kind | all]\n");
+        printf("\nwhere kind is one of:\n");
+        for (const char *kind : ChaoticOscillatorKinds)
+            printf("    %s\n", kind);
         return 1;
     }
 
     const char *kind = argv[1];
-    auto osc = MakeChaoticOscillator(kind);
-    if (!osc)
+    int rc = 1;
+    if (!strcmp(kind, "all"))
     {
-        printf("ERROR: Unknown chaotic oscillator kind '%s'\n", kind);
-        return 1;
+        for (const char *oscKind : ChaoticOscillatorKinds)
+        {
+            auto osc = MakeChaoticOscillator(oscKind);
+            if (!osc)
+            {
+                printf("INTERNAL ERROR: Unknown chaotic oscillator kind '%s'\n", kind);
+                return 1;
+            }
+            printf("Testing: %s\n", oscKind);
+            rc = RangeTest(*osc);
+            if (rc != 0)
+                break;
+        }
     }
-    int rc = RangeTest(*osc);
+    else
+    {
+        auto osc = MakeChaoticOscillator(kind);
+        if (!osc)
+        {
+            printf("ERROR: Unknown chaotic oscillator kind '%s'\n", kind);
+            return 1;
+        }
+        rc = RangeTest(*osc);
+    }
     return rc;
 }
 
