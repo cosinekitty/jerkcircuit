@@ -37,6 +37,7 @@ int main(int argc, const char *argv[])
     SetTargetFPS(30);
     const double dt = 1.0 / SAMPLE_RATE;
     const double angleIncrement = 0.005;
+    bool autoRotate = false;
     while (!WindowShouldClose())
     {
         if (IsKeyDown(KEY_DOWN))
@@ -47,6 +48,10 @@ int main(int argc, const char *argv[])
             plotter.rotateY(+angleIncrement);
         if (IsKeyDown(KEY_RIGHT))
             plotter.rotateY(-angleIncrement);
+        if (IsKeyPressed(KEY_R))
+            autoRotate = !autoRotate;
+        if (autoRotate)
+            plotter.rotateX(+angleIncrement);
         BeginDrawing();
         ClearBackground(BLACK);
         plotter.plot(osc->vx(), osc->vy(), osc->vz());
