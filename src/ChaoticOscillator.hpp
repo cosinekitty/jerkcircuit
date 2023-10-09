@@ -82,10 +82,9 @@ namespace Analog
         double vy() const { return Remap(y, ymin, ymax); }
         double vz() const { return Remap(z, zmin, zmax); }
 
-        void update(float sampleRateHz)
+        void update(double dt)
         {
             SlopeVector s = slopes();
-            double dt = 1.0 / sampleRateHz;
             x += dt * s.mx;
             y += dt * s.my;
             z += dt * s.mz;

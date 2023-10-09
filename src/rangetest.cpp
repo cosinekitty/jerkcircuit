@@ -31,7 +31,7 @@ int main(int argc, const char *argv[])
                 printf("INTERNAL ERROR: Unknown chaotic oscillator kind '%s'\n", kind);
                 return 1;
             }
-            printf("Testing: %s\n", oscKind);
+            printf("\nTesting: %s\n", oscKind);
             rc = RangeTest(*osc);
             if (rc != 0)
                 break;
@@ -79,6 +79,7 @@ static int RangeTest(Analog::ChaoticOscillator& osc)
     const int SAMPLE_RATE = 44100;
     const int SIM_SECONDS = 4 * 3600;
     const int SIM_SAMPLES = SIM_SECONDS * SAMPLE_RATE;
+    const double dt = 1.0 / SAMPLE_RATE;
 
     double xMin = 0;
     double xMax = 0;
@@ -91,7 +92,7 @@ static int RangeTest(Analog::ChaoticOscillator& osc)
     const int SETTLE_SAMPLES = SETTLE_SECONDS * SAMPLE_RATE;
     for (int i = 0; i < SETTLE_SAMPLES; ++i)
     {
-        osc.update(SAMPLE_RATE);
+        osc.update(dt);
         if (CheckLimits(osc)) return 1;
     }
 
@@ -99,7 +100,7 @@ static int RangeTest(Analog::ChaoticOscillator& osc)
 
     for (int i = 0; i < SIM_SAMPLES; ++i)
     {
-        osc.update(SAMPLE_RATE);
+        osc.update(dt);
         if (CheckLimits(osc)) return 1;
         if (i == 0)
         {

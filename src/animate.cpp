@@ -32,6 +32,7 @@ int main(int argc, const char *argv[])
     Plotter plotter(5000);
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Jerk Circuit Simulation");
     SetTargetFPS(30);
+    const double dt = 1.0 / SAMPLE_RATE;
     while (!WindowShouldClose())
     {
         BeginDrawing();
@@ -39,7 +40,7 @@ int main(int argc, const char *argv[])
         plotter.plot(osc->vx(), osc->vy());
         EndDrawing();
         for (int s = 0; s < SAMPLES_PER_FRAME; ++s)
-            osc->update(SAMPLE_RATE);
+            osc->update(dt);
     }
     CloseWindow();
     return 0;
