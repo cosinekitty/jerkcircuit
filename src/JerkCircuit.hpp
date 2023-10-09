@@ -12,7 +12,7 @@
 
 namespace Analog
 {
-    class JerkCircuit : public ChaoticOscillator
+    class JerkCircuit
     {
     private:
         const double timeDilation;
@@ -74,7 +74,7 @@ namespace Analog
             dw = dx = dy = 0;
         }
 
-        int update(float sampleRateHz) override
+        int update(float sampleRateHz)
         {
             double dt = timeDilation / sampleRateHz;
 
@@ -135,8 +135,8 @@ namespace Analog
         }
 
         double wVoltage() const { return w1; }
-        double xVoltage() const override { return x1; }
-        double yVoltage() const override { return y1; }
-        double zVoltage() const override { return z1; }
+        double xVoltage() const { return x1; }
+        double yVoltage() const { return y1; }
+        double zVoltage() const { return z1; }
     };
 }

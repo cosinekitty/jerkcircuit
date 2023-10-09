@@ -18,18 +18,15 @@ int main(int argc, const char *argv[])
 
     if (argc != 2)
     {
-        printf("USAGE: animate [jerk|ruck]\n");
+        printf("USAGE: animate kind\n");
         return 1;
     }
     const char *kind = argv[1];
 
-    JerkCircuit jerk(0.002, +0.507, -0.013, +0.017);
     Rucklidge ruck;
 
     ChaoticOscillator *signal = nullptr;
-    if (!strcmp(kind, "jerk"))
-        signal = &jerk;
-    else if (!strcmp(kind, "ruck"))
+    if (!strcmp(kind, "ruck"))
         signal = &ruck;
     else
     {

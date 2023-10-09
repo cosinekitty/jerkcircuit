@@ -11,8 +11,8 @@ const int SAMPLE_RATE = 44100;
 const int FRAME_RATE = 60;
 const int SAMPLES_PER_FRAME = SAMPLE_RATE / FRAME_RATE;
 
-const double MIN_VOLTAGE = -7.0;
-const double MAX_VOLTAGE = +7.0;
+const double MIN_VOLTAGE = -5.5;
+const double MAX_VOLTAGE = +5.5;
 
 struct PlotPoint
 {
