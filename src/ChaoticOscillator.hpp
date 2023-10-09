@@ -223,4 +223,31 @@ namespace Analog
             max_dt = 0.0001;
         }
     };
+
+    class Bouali : public ChaoticOscillator     // http://www.3d-meier.de/tut19/Seite208.html
+    {
+    private:
+        const double a = 3.0;
+        const double b = 2.2;
+        const double c = 1.0;
+        const double d = 1.491;
+
+    protected:
+        SlopeVector slopes() const override
+        {
+            return SlopeVector(
+                a*x*(1 - y) - b*z,
+                -c*y*(1 - x*x),
+                d*x
+            );
+        }
+
+    public:
+        Bouali()
+            : ChaoticOscillator(
+                1.03, 1.05, 0.012
+            )
+            {
+            }
+    };
 }

@@ -6,6 +6,7 @@ namespace Analog
     const std::vector<const char *> ChaoticOscillatorKinds
     {
         "aiza",
+        "boul",
         "ruck",
         "sprot"
     };
@@ -17,6 +18,9 @@ namespace Analog
 
         if (!strcmp(kind, "aiza"))
             return std::make_unique<Aizawa>();
+
+        if (!strcmp(kind, "boul"))
+            return std::make_unique<Bouali>();
 
         if (!strcmp(kind, "ruck"))
             return std::make_unique<Rucklidge>();
