@@ -78,9 +78,15 @@ namespace Analog
 
         virtual ~ChaoticOscillator() {}
 
+        // Scaled values...
         double vx() const { return Remap(x, xmin, xmax); }
         double vy() const { return Remap(y, ymin, ymax); }
         double vz() const { return Remap(z, zmin, zmax); }
+
+        // Raw values...
+        double rx() const { return x; }
+        double ry() const { return y; }
+        double rz() const { return z; }
 
         void update(double dt)
         {
@@ -136,7 +142,11 @@ namespace Analog
 
     public:
         Aizawa()
-            : ChaoticOscillator(0.1, 0.0, 0.0)
+            : ChaoticOscillator(
+                0.440125, -0.781267, -0.277170,
+                -1.505, +1.490,
+                -1.455, +1.530,
+                -0.370, +1.853)
             {}
     };
 }

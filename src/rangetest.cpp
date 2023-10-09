@@ -96,7 +96,7 @@ static int RangeTest(Analog::ChaoticOscillator& osc)
         if (CheckLimits(osc)) return 1;
     }
 
-    printf("Settled  at: x=%10.6lf, y=%10.6lf, z=%10.6lf\n", osc.vx(), osc.vy(), osc.vz());
+    printf("Settled  at: rx=%10.6lf, ry=%10.6lf, rz=%10.6lf\n", osc.rx(), osc.ry(), osc.rz());
 
     for (int i = 0; i < SIM_SAMPLES; ++i)
     {
@@ -119,11 +119,11 @@ static int RangeTest(Analog::ChaoticOscillator& osc)
         }
     }
 
-    printf("Finished at: x=%10.6lf, y=%10.6lf, z=%10.6lf\n", osc.vx(), osc.vy(), osc.vz());
+    printf("Finished at: rx=%10.6lf, ry=%10.6lf, rz=%10.6lf\n", osc.rx(), osc.ry(), osc.rz());
 
-    printf("x range: %10.6lf %10.6lf\n", xMin, xMax);
-    printf("y range: %10.6lf %10.6lf\n", yMin, yMax);
-    printf("z range: %10.6lf %10.6lf\n", zMin, zMax);
+    printf("vx range: %10.6lf %10.6lf\n", xMin, xMax);
+    printf("vy range: %10.6lf %10.6lf\n", yMin, yMax);
+    printf("vz range: %10.6lf %10.6lf\n", zMin, zMax);
 
     return 0;
 }
