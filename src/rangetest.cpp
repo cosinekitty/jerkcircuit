@@ -77,6 +77,8 @@ static int RangeTest(Analog::ChaoticOscillator& osc)
         if (CheckLimits(osc)) return 1;
     }
 
+    printf("Settled  at: x=%10.6lf, y=%10.6lf, z=%10.6lf\n", osc.xVoltage(), osc.yVoltage(), osc.zVoltage());
+
     for (int i = 0; i < SIM_SAMPLES; ++i)
     {
         osc.update(SAMPLE_RATE);
@@ -97,6 +99,8 @@ static int RangeTest(Analog::ChaoticOscillator& osc)
             zMax = std::max(zMax, osc.zVoltage());
         }
     }
+
+    printf("Finished at: x=%10.6lf, y=%10.6lf, z=%10.6lf\n", osc.xVoltage(), osc.yVoltage(), osc.zVoltage());
 
     printf("x range: %10.6lf %10.6lf\n", xMin, xMax);
     printf("y range: %10.6lf %10.6lf\n", yMin, yMax);

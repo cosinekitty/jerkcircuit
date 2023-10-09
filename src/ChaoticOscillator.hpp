@@ -1,14 +1,56 @@
 #pragma once
 namespace Analog
 {
+    const double AMPLITUDE = 5.0;  // the intended peak amplitude of output voltage
+
+    inline double Remap(double v, double vmin, double vmax)
+    {
+        // Remaps v from the range [vmin, vmax] to [-AMPLITUDE, +AMPLITUDE].
+        // How far along the range is v in the range [vmin, vmax]?
+        double r = (v - vmin) / (vmax - vmin);      // [0, 1]
+        return AMPLITUDE * (2*r - 1);
+    }
+
     class ChaoticOscillator
     {
+    protected:
+        double x;
+        double y;
+        double z;
+
+    private:
+        const double xmin;
+        const double xmax;
+        const double ymin;
+        const double ymax;
+        const double zmin;
+        const double zmax;
+
     public:
+        ChaoticOscillator(
+            double x0, double y0, double z0,
+            double _xmin, double _xmax,
+            double _ymin, double _ymax,
+            double _zmin, double _zmax
+        )
+            : x(x0)
+            , y(y0)
+            , z(z0)
+            , xmin(_xmin)
+            , xmax(_xmax)
+            , ymin(_ymin)
+            , ymax(_ymax)
+            , zmin(_zmin)
+            , zmax(_zmax)
+            {}
+
         virtual ~ChaoticOscillator() {}
-        virtual double xVoltage() const = 0;
-        virtual double yVoltage() const = 0;
-        virtual double zVoltage() const = 0;
-        virtual int update(float sampleRateHz) = 0;
+
+        double xVoltage() const { return Remap(x, xmin, xmax); }
+        double yVoltage() const { return Remap(y, ymin, ymax); }
+        double zVoltage() const { return Remap(z, zmin, zmax); }
+
+        virtual void update(float sampleRateHz) = 0;
     };
 
 
@@ -18,27 +60,12 @@ namespace Analog
         const double k = 2.0;
         const double a = 6.7;
 
-        double x = 1.0;
-        double y = 0.0;
-        double z = 0.0;
-
     public:
-        double xVoltage() const override
-        {
-            return x;
-        }
+        Rucklidge()
+            : ChaoticOscillator(0.788174, 0.522280, 1.250344, -10.2, +10.2, -5.6, +5.6, 0.0, +15.4)
+            {}
 
-        double yVoltage() const override
-        {
-            return y;
-        }
-
-        double zVoltage() const override
-        {
-            return z;
-        }
-
-        int update(float sampleRateHz) override
+        void update(float sampleRateHz) override
         {
             double dt = 1.0 / sampleRateHz;
             double dx = dt*(-k*x + a*y - y*z);
@@ -47,7 +74,6 @@ namespace Analog
             x += dx;
             y += dy;
             z += dz;
-            return 1;
         }
     };
 }
