@@ -125,10 +125,11 @@ static int RangeTest(Analog::ChaoticOscillator& osc)
     printf("vy range: %10.6lf %10.6lf\n", yMin, yMax);
     printf("vz range: %10.6lf %10.6lf\n", zMin, zMax);
 
-    if (osc.isTuned)
+    if (osc.isTuned && !osc.hasStabilityProtection())
     {
         // Try larger and larger dt values until we find the limits of stability.
         // Allow a tiny excess amplitude before we consider the simulation unstable.
+        printf("Searching for largest stable time step...\n");
         const double limit = Analog::AMPLITUDE + 0.1;
         const double dilate = 1.05;
         const int STABLE_SAMPLES = 600 * SAMPLE_RATE;
@@ -142,6 +143,7 @@ static int RangeTest(Analog::ChaoticOscillator& osc)
                 if (!std::isfinite(osc.vx()) || !std::isfinite(osc.vy()) || !std::isfinite(osc.vz()))
                 {
                     printf("Encountered non-finite voltage at sample %d, et=%lg.\n", i, et);
+                    printf("Largest stable time step was: %lg\n", et/dilate);
                     goto done;
                 }
                 double r = std::abs(osc.vx());
@@ -150,6 +152,7 @@ static int RangeTest(Analog::ChaoticOscillator& osc)
                 if (r > limit)
                 {
                     printf("Encountered excessive value %lg at sample %d, et=%lg.\n", r, i, et);
+                    printf("Largest stable time step was: %lg\n", et/dilate);
                     goto done;
                 }
             }

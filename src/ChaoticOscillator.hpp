@@ -1,4 +1,7 @@
 #pragma once
+
+#include <cmath>
+
 namespace Analog
 {
     const double AMPLITUDE = 5.0;  // the intended peak amplitude of output voltage
@@ -33,6 +36,8 @@ namespace Analog
     class ChaoticOscillator
     {
     protected:
+        double max_dt = 0.0;
+
         double x{};
         double y{};
         double z{};
@@ -92,6 +97,8 @@ namespace Analog
 
         virtual ~ChaoticOscillator() {}
 
+        bool hasStabilityProtection() const { return max_dt > 0.0; }
+
         void initialize()
         {
             x = x0;
@@ -111,10 +118,18 @@ namespace Analog
 
         void update(double dt)
         {
-            SlopeVector s = slopes();
-            x += dt * s.mx;
-            y += dt * s.my;
-            z += dt * s.mz;
+            // If the derived class has informed us of a maximum stable time increment,
+            // use oversampling to keep the actual time increment within that limit:
+            // find the smallest positive integer n such that dt/n <= max_dt.
+            const int n = (max_dt <= 0.0) ? 1 : static_cast<int>(std::ceil(dt / max_dt));
+            const double et = dt / n;
+            for (int i = 0; i < n; ++i)
+            {
+                SlopeVector s = slopes();
+                x += et * s.mx;
+                y += et * s.my;
+                z += et * s.mz;
+            }
         }
     };
 
@@ -142,7 +157,9 @@ namespace Analog
                 -10.144, +10.168,
                  -5.570,  +5.565,
                  +0.040,  +15.387)
-            {}
+        {
+            max_dt = 0.002;
+        }
     };
 
 
@@ -173,6 +190,8 @@ namespace Analog
                 -1.505, +1.490,
                 -1.455, +1.530,
                 -0.370, +1.853)
-            {}
+        {
+            max_dt = 0.0007;
+        }
     };
 }
