@@ -19,6 +19,9 @@ int main(int argc, const char *argv[])
     if (argc != 2)
     {
         printf("USAGE: animate kind\n");
+        printf("where kind is one of the following:\n");
+        for (const char *kind : ChaoticOscillatorKinds)
+            printf("    %s\n", kind);
         return 1;
     }
     const char *kind = argv[1];
@@ -33,7 +36,7 @@ int main(int argc, const char *argv[])
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Jerk Circuit Simulation");
     SetTargetFPS(30);
     const double dt = 1.0 / SAMPLE_RATE;
-    const double angleIncrement = 0.01;
+    const double angleIncrement = 0.005;
     while (!WindowShouldClose())
     {
         if (IsKeyDown(KEY_DOWN))
