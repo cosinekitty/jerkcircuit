@@ -194,4 +194,28 @@ namespace Analog
             max_dt = 0.0007;
         }
     };
+
+
+    class Sprott : public ChaoticOscillator     // http://www.3d-meier.de/tut19/Seite192.html
+    {
+    private:
+        const double a = 2.5;
+        const double b = 1.5;
+
+    protected:
+        SlopeVector slopes() const override
+        {
+            return SlopeVector(
+                a*(y - x),
+                x*z,
+                b - y*y
+            );
+        }
+
+    public:
+        Sprott()
+            : ChaoticOscillator(0.03, 0.01, 0.02)
+        {
+        }
+    };
 }
