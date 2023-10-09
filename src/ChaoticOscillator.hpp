@@ -52,6 +52,8 @@ namespace Analog
         const double zmax;
 
     public:
+        const bool isTuned;
+
         ChaoticOscillator(
             double _x0, double _y0, double _z0,
             double _xmin, double _xmax,
@@ -67,6 +69,7 @@ namespace Analog
             , ymax(_ymax)
             , zmin(_zmin)
             , zmax(_zmax)
+            , isTuned(true)
         {
             initialize();
         }
@@ -82,6 +85,7 @@ namespace Analog
             , ymax(0.0)
             , zmin(0.0)
             , zmax(0.0)
+            , isTuned(false)
         {
             initialize();
         }

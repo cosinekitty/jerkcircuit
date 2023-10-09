@@ -52,7 +52,7 @@ int main(int argc, const char *argv[])
 
 static int CheckLimits(const Analog::ChaoticOscillator& osc)
 {
-    const double LIMIT = 1000.0;
+    const double LIMIT = osc.isTuned ? Analog::AMPLITUDE : 1000.0;
     double x = osc.vx();
     double y = osc.vy();
     double z = osc.vz();
@@ -124,6 +124,38 @@ static int RangeTest(Analog::ChaoticOscillator& osc)
     printf("vx range: %10.6lf %10.6lf\n", xMin, xMax);
     printf("vy range: %10.6lf %10.6lf\n", yMin, yMax);
     printf("vz range: %10.6lf %10.6lf\n", zMin, zMax);
+
+    if (osc.isTuned)
+    {
+        // Try larger and larger dt values until we find the limits of stability.
+        // Allow a tiny excess amplitude before we consider the simulation unstable.
+        const double limit = Analog::AMPLITUDE + 0.1;
+        const double dilate = 1.05;
+        const int STABLE_SAMPLES = 600 * SAMPLE_RATE;
+        for (double et = dt * dilate; et < 1.0; et *= dilate)
+        {
+            //printf("Dilated time increment = %lg\n", et);
+            osc.initialize();
+            for (int i = 0; i < STABLE_SAMPLES; ++i)
+            {
+                osc.update(et);
+                if (!std::isfinite(osc.vx()) || !std::isfinite(osc.vy()) || !std::isfinite(osc.vz()))
+                {
+                    printf("Encountered non-finite voltage at sample %d, et=%lg.\n", i, et);
+                    goto done;
+                }
+                double r = std::abs(osc.vx());
+                r = std::max(r, std::abs(osc.vy()));
+                r = std::max(r, std::abs(osc.vz()));
+                if (r > limit)
+                {
+                    printf("Encountered excessive value %lg at sample %d, et=%lg.\n", r, i, et);
+                    goto done;
+                }
+            }
+        }
+    }
+done:
 
     return 0;
 }
