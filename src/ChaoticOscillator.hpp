@@ -15,12 +15,27 @@ namespace Analog
         return AMPLITUDE * (2*r - 1);
     }
 
+    struct SlopeVector
+    {
+        double mx;
+        double my;
+        double mz;
+
+        SlopeVector(double _mx, double _my, double _mz)
+            : mx(_mx)
+            , my(_my)
+            , mz(_mz)
+            {}
+    };
+
     class ChaoticOscillator
     {
     protected:
         double x;
         double y;
         double z;
+
+        virtual SlopeVector slopes() const = 0;
 
     private:
         const double xmin;
@@ -67,7 +82,14 @@ namespace Analog
         double vy() const { return Remap(y, ymin, ymax); }
         double vz() const { return Remap(z, zmin, zmax); }
 
-        virtual void update(float sampleRateHz) = 0;
+        void update(float sampleRateHz)
+        {
+            SlopeVector s = slopes();
+            double dt = 1.0 / sampleRateHz;
+            x += dt * s.mx;
+            y += dt * s.my;
+            z += dt * s.mz;
+        }
     };
 
 
@@ -77,21 +99,20 @@ namespace Analog
         const double k = 2.0;
         const double a = 6.7;
 
+    protected:
+        SlopeVector slopes() const override
+        {
+            return SlopeVector (
+                -k*x + a*y - y*z,
+                x,
+                -z + y*y
+            );
+        }
+
     public:
         Rucklidge()
             : ChaoticOscillator(0.788174, 0.522280, 1.250344, -10.2, +10.2, -5.6, +5.6, 0.0, +15.4)
             {}
-
-        void update(float sampleRateHz) override
-        {
-            double dt = 1.0 / sampleRateHz;
-            double dx = dt*(-k*x + a*y - y*z);
-            double dy = dt*(x);
-            double dz = dt*(-z + y*y);
-            x += dx;
-            y += dy;
-            z += dz;
-        }
     };
 
     class Aizawa : public ChaoticOscillator     // http://www.3d-meier.de/tut19/Seite3.html
@@ -104,20 +125,19 @@ namespace Analog
         const double e = 0.25;
         const double f = 0.1;
 
+    protected:
+        SlopeVector slopes() const override
+        {
+            return SlopeVector(
+                (z-b)*x - d*y,
+                d*x + (z-b)*y,
+                c + a*z - z*z*z/3 - (x*x + y*y)*(1 + e*z) + f*z*x*x*x
+            );
+        }
+
     public:
         Aizawa()
             : ChaoticOscillator(0.1, 0.0, 0.0)
             {}
-
-        void update(float sampleRateHz) override
-        {
-            double dt = 1.0 / sampleRateHz;
-            double dx = dt*((z-b)*x - d*y);
-            double dy = dt*(d*x + (z-b)*y);
-            double dz = dt*(c + a*z - z*z*z/3 - (x*x + y*y)*(1 + e*z) + f*z*x*x*x);
-            x += dx;
-            y += dy;
-            z += dz;
-        }
     };
 }
