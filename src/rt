@@ -1,0 +1,17 @@
+#!/bin/bash
+
+cppcheck --error-exitcode=9 --inline-suppr \
+    --suppress=missingIncludeSystem \
+    -I . --enable=all \
+    rangetest.cpp || exit 1
+
+if [[ "$1" == "debug" ]]; then
+    CPPOPT="-Og -g"
+    shift
+else
+    CPPOPT="-O3"
+fi
+g++ ${CPPOPT} -Wall -Werror -o rangetest rangetest.cpp || exit 1
+
+./rangetest $1 || exit 1
+exit 0

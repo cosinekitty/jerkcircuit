@@ -4,6 +4,7 @@ namespace Analog
     class ChaoticOscillator
     {
     public:
+        virtual ~ChaoticOscillator() {}
         virtual double xVoltage() const = 0;
         virtual double yVoltage() const = 0;
         virtual double zVoltage() const = 0;
