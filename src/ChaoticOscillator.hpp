@@ -145,12 +145,15 @@ namespace Analog
     {
     private:
         const double k = 2.0;
+        const double a1 = 3.8;      // minimum value of `a`: simple non-chaotic double loop
+        const double a2 = 6.7;      // maximum value of `a`: stable but chaotic
+        const double center = (a2 + a1) / 2;
+        const double factor = (a2 - a1) / 2;
 
     protected:
         SlopeVector slopes() const override
         {
-            const double a = 6.7 + (0.3 * knob);
-
+            const double a = center + (factor * knob);
             return SlopeVector (
                 -k*x + a*y - y*z,
                 x,
