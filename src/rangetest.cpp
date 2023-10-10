@@ -76,9 +76,9 @@ static int CheckLimits(const Analog::ChaoticOscillator& osc)
 
 static int RangeTest(Analog::ChaoticOscillator& osc)
 {
-    const int SAMPLE_RATE = 44100;
-    const int SIM_SECONDS = 4 * 3600;
-    const int SIM_SAMPLES = SIM_SECONDS * SAMPLE_RATE;
+    const long SAMPLE_RATE = 44100;
+    const long SIM_SECONDS = 24 * 3600;
+    const long SIM_SAMPLES = SIM_SECONDS * SAMPLE_RATE;
     const double dt = 1.0 / SAMPLE_RATE;
 
     double xMin = 0;
@@ -88,9 +88,9 @@ static int RangeTest(Analog::ChaoticOscillator& osc)
     double zMin = 0;
     double zMax = 0;
 
-    const int SETTLE_SECONDS = 60;
-    const int SETTLE_SAMPLES = SETTLE_SECONDS * SAMPLE_RATE;
-    for (int i = 0; i < SETTLE_SAMPLES; ++i)
+    const long SETTLE_SECONDS = 60;
+    const long SETTLE_SAMPLES = SETTLE_SECONDS * SAMPLE_RATE;
+    for (long i = 0; i < SETTLE_SAMPLES; ++i)
     {
         osc.update(dt);
         if (CheckLimits(osc)) return 1;
@@ -98,7 +98,7 @@ static int RangeTest(Analog::ChaoticOscillator& osc)
 
     printf("Settled  at: rx=%10.6lf, ry=%10.6lf, rz=%10.6lf\n", osc.rx(), osc.ry(), osc.rz());
 
-    for (int i = 0; i < SIM_SAMPLES; ++i)
+    for (long i = 0; i < SIM_SAMPLES; ++i)
     {
         osc.update(dt);
         if (CheckLimits(osc)) return 1;
@@ -132,17 +132,17 @@ static int RangeTest(Analog::ChaoticOscillator& osc)
         printf("Searching for largest stable time step...\n");
         const double limit = Analog::AMPLITUDE + 0.1;
         const double dilate = 1.05;
-        const int STABLE_SAMPLES = 600 * SAMPLE_RATE;
+        const long STABLE_SAMPLES = 600 * SAMPLE_RATE;
         for (double et = dt * dilate; et < 1.0; et *= dilate)
         {
             //printf("Dilated time increment = %lg\n", et);
             osc.initialize();
-            for (int i = 0; i < STABLE_SAMPLES; ++i)
+            for (long i = 0; i < STABLE_SAMPLES; ++i)
             {
                 osc.update(et);
                 if (!std::isfinite(osc.vx()) || !std::isfinite(osc.vy()) || !std::isfinite(osc.vz()))
                 {
-                    printf("Encountered non-finite voltage at sample %d, et=%lg.\n", i, et);
+                    printf("Encountered non-finite voltage at sample %ld, et=%lg.\n", i, et);
                     printf("Largest stable time step was: %lg\n", et/dilate);
                     goto done;
                 }
@@ -151,7 +151,7 @@ static int RangeTest(Analog::ChaoticOscillator& osc)
                 r = std::max(r, std::abs(osc.vz()));
                 if (r > limit)
                 {
-                    printf("Encountered excessive value %lg at sample %d, et=%lg.\n", r, i, et);
+                    printf("Encountered excessive value %lg at sample %ld, et=%lg.\n", r, i, et);
                     printf("Largest stable time step was: %lg\n", et/dilate);
                     goto done;
                 }

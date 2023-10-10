@@ -154,7 +154,7 @@ namespace Analog
         Rucklidge()
             : ChaoticOscillator(
                 0.788174, 0.522280, 1.250344,
-                -10.144, +10.168,
+                -10.15,  +10.17,
                  -5.570,  +5.565,
                  +0.040,  +15.387)
         {
@@ -216,13 +216,14 @@ namespace Analog
         Sprott()
             : ChaoticOscillator(
                 0.010847, 0.003817, 0.485189,
-                -3.860,  +4.061,
-                -5.565,  +6.006,
-                -8.437,  +8.085)
+                -3.91, +4.07,
+                -5.66, +6.01,
+                -8.44, +8.09)
         {
             max_dt = 0.0001;
         }
     };
+
 
     class Bouali : public ChaoticOscillator     // http://www.3d-meier.de/tut19/Seite208.html
     {
@@ -245,9 +246,12 @@ namespace Analog
     public:
         Bouali()
             : ChaoticOscillator(
-                1.03, 1.05, 0.012
-            )
+                1.03, 1.05, 0.012,
+                -4.860, 4.934,
+                 0.009, 6.345,
+                -3.947, 3.866)
             {
+                max_dt = 0.00018;
             }
     };
 }
