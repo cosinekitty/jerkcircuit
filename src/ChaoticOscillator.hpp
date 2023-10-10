@@ -37,6 +37,7 @@ namespace Analog
     {
     protected:
         double max_dt = 0.0;
+        double knob = 0.0;
 
         double x{};
         double y{};
@@ -106,6 +107,12 @@ namespace Analog
             z = z0;
         }
 
+        void setKnob(double k)
+        {
+            // Enforce keeping the knob in the range [-1, 1].
+            knob = std::max(-1.0, std::min(+1.0, k));
+        }
+
         // Scaled values...
         double vx() const { return Remap(x, xmin, xmax); }
         double vy() const { return Remap(y, ymin, ymax); }
@@ -138,11 +145,12 @@ namespace Analog
     {
     private:
         const double k = 2.0;
-        const double a = 6.7;
 
     protected:
         SlopeVector slopes() const override
         {
+            const double a = 6.7 + (0.3 * knob);
+
             return SlopeVector (
                 -k*x + a*y - y*z,
                 x,
