@@ -87,7 +87,7 @@ int main(int argc, const char *argv[])
         {
             osc->update(dt);
             pt += dt;
-            if (pt > 0.03)
+            if (pt > 0.01)
             {
                 pt = 0.0;
                 plotter.append(osc->vx(), osc->vy(), osc->vz());
