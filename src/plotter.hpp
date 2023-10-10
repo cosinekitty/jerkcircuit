@@ -141,4 +141,11 @@ public:
         ScreenPoint s = project(current);
         DrawCircle(s.sx, s.sy, 2.0f, WHITE);
     }
+
+    void displayKnob(int knob)
+    {
+        char text[50];
+        snprintf(text, sizeof(text), "knob: %3d", knob);
+        DrawText(text, 5, 5, 20, BROWN);
+    }
 };
