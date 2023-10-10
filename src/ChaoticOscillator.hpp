@@ -121,6 +121,13 @@ namespace Analog
             knob = std::max(-1.0, std::min(+1.0, k));
         }
 
+        void thump()
+        {
+            x += 1.0e-3;
+            y += 1.0e-3;
+            z -= 1.0e-3;
+        }
+
         // Scaled values...
         double vx() const { return Remap(x, xmin, xmax); }
         double vy() const { return Remap(y, ymin, ymax); }
@@ -184,8 +191,7 @@ namespace Analog
     {
     private:
         const double a = 0.95;
-        const double b = 0.7;
-        const double c = 0.6;
+        const double b = 0.69535;
         const double d = 3.5;
         const double e = 0.25;
         const double f = 0.1;
@@ -193,6 +199,7 @@ namespace Analog
     protected:
         SlopeVector slopes() const override
         {
+            const double c = KnobValue(knob, 0.593, 0.615);
             return SlopeVector(
                 (z-b)*x - d*y,
                 d*x + (z-b)*y,
@@ -208,7 +215,7 @@ namespace Analog
                 -1.455, +1.530,
                 -0.370, +1.853)
         {
-            max_dt = 0.0007;
+            max_dt = 5.0e-05;
         }
     };
 

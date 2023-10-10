@@ -159,4 +159,9 @@ public:
         snprintf(text, sizeof(text), "speed: %4d", speed);
         DrawText(text, SCREEN_WIDTH-115, 5, 20, BROWN);
     }
+
+    void displayFailureText()
+    {
+        DrawText("FAILURE", SCREEN_WIDTH/2 - 100, SCREEN_HEIGHT/2 - 10, 20, RED);
+    }
 };

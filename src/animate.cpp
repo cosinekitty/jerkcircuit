@@ -12,6 +12,22 @@
 #include "MakeChaoticOscillator.hpp"
 #include "plotter.hpp"
 
+
+bool IsOutOfBounds(const Analog::ChaoticOscillator& osc)
+{
+    using namespace std;
+
+    double x = osc.vx();
+    double y = osc.vy();
+    double z = osc.vz();
+    if (!isfinite(x) || !isfinite(y) || !isfinite(z))
+        return true;
+
+    double r = sqrt(x*x + y*y + z*z);
+    return r > 20.0;
+}
+
+
 int main(int argc, const char *argv[])
 {
     using namespace Analog;
@@ -41,6 +57,7 @@ int main(int argc, const char *argv[])
     int speed = 0;
     int knobRepeat = 0;
     const int knobThresh = 5;
+    bool failure = false;
     while (!WindowShouldClose())
     {
         if (IsKeyDown(KEY_DOWN))
@@ -53,6 +70,8 @@ int main(int argc, const char *argv[])
             plotter.rotateY(-angleIncrement);
         if (IsKeyPressed(KEY_R))
             autoRotate = !autoRotate;
+        if (IsKeyPressed(KEY_T))
+            osc->thump();
         if (autoRotate)
             plotter.rotateX(+angleIncrement);
         if (IsKeyDown(KEY_PAGE_UP) && (knob < 100) && (++knobRepeat >= knobThresh))
@@ -79,18 +98,28 @@ int main(int argc, const char *argv[])
         ClearBackground(BLACK);
         plotter.displayKnob(knob);
         plotter.displaySpeed(speed);
-        plotter.append(osc->vx(), osc->vy(), osc->vz());
-        osc->setKnob(knob / 100.0);
-        double dt = std::pow(10.0, 3.0*(speed/100.0)) / SAMPLE_RATE;
-        double pt = 0.0;
-        for (int s = 0; s < SAMPLES_PER_FRAME; ++s)
+        if (failure)
         {
-            osc->update(dt);
-            pt += dt;
-            if (pt > 0.01)
+            plotter.displayFailureText();
+        }
+        else
+        {
+            plotter.append(osc->vx(), osc->vy(), osc->vz());
+            osc->setKnob(knob / 100.0);
+            double dt = std::pow(10.0, 3.0*(speed/100.0)) / SAMPLE_RATE;
+            double pt = 0.0;
+            for (int s = 0; s < SAMPLES_PER_FRAME; ++s)
             {
-                pt = 0.0;
-                plotter.append(osc->vx(), osc->vy(), osc->vz());
+                osc->update(dt);
+                failure = IsOutOfBounds(*osc);
+                if (failure)
+                    break;
+                pt += dt;
+                if (pt > 0.01)
+                {
+                    pt = 0.0;
+                    plotter.append(osc->vx(), osc->vy(), osc->vz());
+                }
             }
         }
         plotter.plot();
