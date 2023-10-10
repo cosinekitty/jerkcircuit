@@ -99,7 +99,7 @@ public:
         return project(vec.nx, vec.ny, vec.nz);
     }
 
-    void plot(double vx, double vy, double vz)
+    void append(double vx, double vy, double vz)
     {
         PlotVector current(vx, vy, vz);
 
@@ -109,7 +109,10 @@ public:
 
         trail.at(trailIndex) = current;
         trailIndex = (trailIndex + 1) % trailLength;
+    }
 
+    void plot()
+    {
         Color color = BLACK;
         Color target = GREEN;
 
@@ -138,6 +141,7 @@ public:
             }
         }
 
+        const PlotVector& current = trail.at((trailIndex + trailLength - 1) % trailLength);
         ScreenPoint s = project(current);
         DrawCircle(s.sx, s.sy, 2.0f, WHITE);
     }
@@ -145,7 +149,14 @@ public:
     void displayKnob(int knob)
     {
         char text[50];
-        snprintf(text, sizeof(text), "knob: %3d", knob);
+        snprintf(text, sizeof(text), "knob: %4d", knob);
         DrawText(text, 5, 5, 20, BROWN);
+    }
+
+    void displaySpeed(int speed)
+    {
+        char text[50];
+        snprintf(text, sizeof(text), "speed: %4d", speed);
+        DrawText(text, SCREEN_WIDTH-115, 5, 20, BROWN);
     }
 };

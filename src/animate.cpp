@@ -32,15 +32,15 @@ int main(int argc, const char *argv[])
         return 1;
     }
 
-    Plotter plotter(5000);
+    Plotter plotter(8000);
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Danger Tractor prototype by Don Cross");
-    SetTargetFPS(30);
-    const double dt = 1.0 / SAMPLE_RATE;
+    SetTargetFPS(60);
     const double angleIncrement = 0.005;
     bool autoRotate = false;
     int knob = 0;
+    int speed = 0;
     int knobRepeat = 0;
-    const int knobThresh = 3;
+    const int knobThresh = 5;
     while (!WindowShouldClose())
     {
         if (IsKeyDown(KEY_DOWN))
@@ -65,14 +65,36 @@ int main(int argc, const char *argv[])
             --knob;
             knobRepeat = 0;
         }
+        if (IsKeyDown(KEY_HOME) && (speed < 100) && (++knobRepeat >= knobThresh))
+        {
+            ++speed;
+            knobRepeat = 0;
+        }
+        if (IsKeyDown(KEY_END) && (speed > 0) && (++knobRepeat >= knobThresh))
+        {
+            --speed;
+            knobRepeat = 0;
+        }
         BeginDrawing();
         ClearBackground(BLACK);
         plotter.displayKnob(knob);
+        plotter.displaySpeed(speed);
+        plotter.append(osc->vx(), osc->vy(), osc->vz());
         osc->setKnob(knob / 100.0);
-        plotter.plot(osc->vx(), osc->vy(), osc->vz());
-        EndDrawing();
+        double dt = std::pow(10.0, 3.0*(speed/100.0)) / SAMPLE_RATE;
+        double pt = 0.0;
         for (int s = 0; s < SAMPLES_PER_FRAME; ++s)
+        {
             osc->update(dt);
+            pt += dt;
+            if (pt > 0.03)
+            {
+                pt = 0.0;
+                plotter.append(osc->vx(), osc->vy(), osc->vz());
+            }
+        }
+        plotter.plot();
+        EndDrawing();
     }
     CloseWindow();
     return 0;
