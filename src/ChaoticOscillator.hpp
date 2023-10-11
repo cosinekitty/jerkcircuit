@@ -47,13 +47,11 @@ namespace Analog
         double max_dt = 0.0;
         double knob = 0.0;
 
-        double x{};
-        double y{};
-        double z{};
-
-        virtual SlopeVector slopes() const = 0;
+        virtual SlopeVector slopes(double x, double y, double z) const = 0;
 
     private:
+        const int max_iter = 2;
+
         const double x0;
         const double y0;
         const double z0;
@@ -64,6 +62,31 @@ namespace Analog
         const double ymax;
         const double zmin;
         const double zmax;
+
+        double x1{};
+        double y1{};
+        double z1{};
+
+        void step(double dt)
+        {
+            SlopeVector s = slopes(x1, y1, z1);
+            double dx = dt * s.mx;
+            double dy = dt * s.my;
+            double dz = dt * s.mz;
+            for (int iter = 0; iter < max_iter; ++iter)
+            {
+                double xm = x1 + dx/2;
+                double ym = y1 + dy/2;
+                double zm = z1 + dz/2;
+                s = slopes(xm, ym, zm);
+                dx = dt * s.mx;
+                dy = dt * s.my;
+                dz = dt * s.mz;
+            }
+            x1 += dx;
+            y1 += dy;
+            z1 += dz;
+        }
 
     public:
         const bool isTuned;
@@ -110,9 +133,9 @@ namespace Analog
 
         void initialize()
         {
-            x = x0;
-            y = y0;
-            z = z0;
+            x1 = x0;
+            y1 = y0;
+            z1 = z0;
         }
 
         void setKnob(double k)
@@ -121,22 +144,15 @@ namespace Analog
             knob = std::max(-1.0, std::min(+1.0, k));
         }
 
-        void thump()
-        {
-            x += 1.0e-3;
-            y += 1.0e-3;
-            z -= 1.0e-3;
-        }
-
         // Scaled values...
-        double vx() const { return Remap(x, xmin, xmax); }
-        double vy() const { return Remap(y, ymin, ymax); }
-        double vz() const { return Remap(z, zmin, zmax); }
+        double vx() const { return Remap(x1, xmin, xmax); }
+        double vy() const { return Remap(y1, ymin, ymax); }
+        double vz() const { return Remap(z1, zmin, zmax); }
 
         // Raw values...
-        double rx() const { return x; }
-        double ry() const { return y; }
-        double rz() const { return z; }
+        double rx() const { return x1; }
+        double ry() const { return y1; }
+        double rz() const { return z1; }
 
         void update(double dt)
         {
@@ -146,12 +162,7 @@ namespace Analog
             const int n = (max_dt <= 0.0) ? 1 : static_cast<int>(std::ceil(dt / max_dt));
             const double et = dt / n;
             for (int i = 0; i < n; ++i)
-            {
-                SlopeVector s = slopes();
-                x += et * s.mx;
-                y += et * s.my;
-                z += et * s.mz;
-            }
+                step(et);
         }
     };
 
@@ -164,7 +175,7 @@ namespace Analog
         const double a2 = 6.7;      // maximum value of `a`: stable but chaotic
 
     protected:
-        SlopeVector slopes() const override
+        SlopeVector slopes(double x, double y, double z) const override
         {
             const double a = KnobValue(knob, a1, a2);
             return SlopeVector (
@@ -182,7 +193,7 @@ namespace Analog
                  -5.570,  +5.565,
                   0.000, +15.387)
         {
-            max_dt = 5.0e-04;
+            max_dt = 0.001;
         }
     };
 
@@ -197,7 +208,7 @@ namespace Analog
         const double f = 0.1;
 
     protected:
-        SlopeVector slopes() const override
+        SlopeVector slopes(double x, double y, double z) const override
         {
             const double c = KnobValue(knob, 0.593, 0.615);
             return SlopeVector(
@@ -227,7 +238,7 @@ namespace Analog
         const double b = 1.5;
 
     protected:
-        SlopeVector slopes() const override
+        SlopeVector slopes(double x, double y, double z) const override
         {
             return SlopeVector(
                 a*(y - x),
@@ -258,7 +269,7 @@ namespace Analog
         const double d = 1.491;
 
     protected:
-        SlopeVector slopes() const override
+        SlopeVector slopes(double x, double y, double z) const override
         {
             return SlopeVector(
                 a*x*(1 - y) - b*z,

@@ -70,8 +70,6 @@ int main(int argc, const char *argv[])
             plotter.rotateY(-angleIncrement);
         if (IsKeyPressed(KEY_R))
             autoRotate = !autoRotate;
-        if (IsKeyPressed(KEY_T))
-            osc->thump();
         if (autoRotate)
             plotter.rotateX(+angleIncrement);
         if (IsKeyDown(KEY_PAGE_UP) && (knob < 100) && (++knobRepeat >= knobThresh))
