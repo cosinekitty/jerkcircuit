@@ -210,7 +210,7 @@ namespace Analog
     protected:
         SlopeVector slopes(double x, double y, double z) const override
         {
-            const double c = KnobValue(knob, 0.593, 0.615);
+            const double c = KnobValue(knob, 0.5941, 0.6117);
             return SlopeVector(
                 (z-b)*x - d*y,
                 d*x + (z-b)*y,
